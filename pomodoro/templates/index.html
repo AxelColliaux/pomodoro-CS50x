@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block main %}
+    <div class="container mt-5 d-flex flex-column justify-content-center align-items-center">
+        <p class="saving-message d-none"></p>
+        <h1 class="mode-label">Focus</h1>
+        <div class="timer p-4 mb-4 bg-secondary">
+            <span class="minutes"></span>:<span class="seconds"></span>
+        </div>
+        <div class="mb-4">
+            <button class="start btn btn-secondary me-2"> Start </button>
+            <button class="pause btn btn-secondary me-2"> Pause </button>
+            <button class="reset btn btn-secondary"> Reset </button>
+        </div>
+
+        <div class="font-weight-bold settings-label">Settings</div>
+        <div class="settings card p-3 mt-3 d-none bg-secondary">
+            <div class="alert alert-danger alert-message d-none" role="alert"></div>
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label class="form-label text-light">Work time (min)</label>
+                    <input type="number" class="work-time form-control" value="25" min="1">
+                </div>
+                <div class="col-6">
+                    <label class="form-label text-light">Break time (min)</label>
+                    <input type="number" class="break-time form-control" value="5" min="1">
+                </div>
+            </div>
+            <button class="btn save-settings text-light">Save</button>
+        </div>
+    </div>
+{% endblock %}

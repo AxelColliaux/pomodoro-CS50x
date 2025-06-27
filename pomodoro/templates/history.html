@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Your pomodoro history</h1>
+        {% with messages = get_flashed_messages(with_categories=true)%}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Sessions</h5>
+                        <p class="card-text display-4">{{ stats.total_sessions }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Completed Sessions</h5>
+                        <p class="card-text display-4">{{ stats.completed_sessions }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Minutes</h5>
+                        <p class="card-text display-4">{{ stats.total_minutes }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if sessions %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Start time</th>
+                            <th>Duration (min)</th>
+                            <th>Planned (min)</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+
+                            <tr>
+                                <td>{{ session.date }}</td>
+                                <td>{{ session.start_time.split()[1].split('.')[0] }}</td>
+                                <td>{{ (session.duration / 60) | round|int }}</td>
+                                <td>{{ (session.planned_duration / 60) | round|int }}</td>
+                                <td>
+                                    {% if session.completed %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Stopped</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form action="/delete_session" method="post" class="d-inline">
+                                        <input type="hidden" name="session_id" value="{{session.id}}">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You haven't completed any pomodoro session yet. Start a session to see your history here
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

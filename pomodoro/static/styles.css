@@ -1,0 +1,13 @@
+.timer {
+    font-size: 5rem;
+    font-weight: bold;
+    background-color: grey;
+    border-radius: 10px
+}
+
+.settings-label {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
