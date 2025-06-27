@@ -168,3 +168,6 @@ def delete_session():
     except Exception as e:
         flash(f"An error occured: {str(e)}", "danger")
         return redirect("/history")
+
+if __name__ == "__main__":
+    app.run(debug=True)
