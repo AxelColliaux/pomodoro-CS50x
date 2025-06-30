@@ -1,3 +1,7 @@
 .idea
 app/flask_session/
 app/pomodoro.db
+.env
+ops/terraform/.terraform/
+ops/terraform/terraform.tfstate
+ops/terraform/terraform.tfstate.backup

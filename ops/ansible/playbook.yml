@@ -1,0 +1,33 @@
+- hosts: pomodoro
+  become: yes
+  tasks:
+    - name: Install Python 3 et pip
+      apt:
+        name:
+          - python3
+          - python3-pip
+        update_cache: yes
+
+    - name: Installer Flask via pip
+      pip:
+        name: flask
+
+    - name: Cloner le projet pomodoro
+      git:
+        repo: 'https://github.com/AxelColliaux/pomodoro-CS50x.git'
+        dest: /home/azureuser/pomodoro
+        update: yes
+
+    - name: Installer les dépendances Python du projet
+      pip:
+        requirements: /home/azureuser/pomodoro/app/requirements.txt
+      args:
+        chdir: /home/azureuser/pomodoro
+
+    - name: Lancer Flask en arrière-plan
+      shell: nohup flask run --host=0.0.0.0 &
+      args:
+        chdir: /home/azureuser/pomodoro/app
+      environment:
+        FLASK_APP: app.py
+        FLASK_ENV: production
