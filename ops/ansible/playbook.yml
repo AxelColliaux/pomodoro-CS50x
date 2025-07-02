@@ -18,16 +18,60 @@
         dest: /home/azureuser/pomodoro
         update: yes
 
+    - name: S'assurer que le dossier flask_session existe avec les bons droits
+      file:
+        path: /home/azureuser/pomodoro/app/flask_session
+        state: directory
+        owner: azureuser
+        group: azureuser
+        mode: '0700'
+
     - name: Installer les dépendances Python du projet
       pip:
         requirements: /home/azureuser/pomodoro/app/requirements.txt
       args:
         chdir: /home/azureuser/pomodoro
 
-    - name: Lancer Flask en arrière-plan
-      shell: nohup flask run --host=0.0.0.0 &
+    - name: Créer une base SQLite vide si absente
+      file:
+        path: /home/azureuser/pomodoro/app/pomodoro.db
+        state: touch
+        owner: azureuser
+        group: azureuser
+        mode: '0664'
+
+    - name: Initialiser la base SQLite avec la structure attendue
+      shell: sqlite3 /home/azureuser/pomodoro/app/pomodoro.db < /home/azureuser/pomodoro/app/init_db.sql
       args:
-        chdir: /home/azureuser/pomodoro/app
-      environment:
-        FLASK_APP: app.py
-        FLASK_ENV: production
+        creates: /home/azureuser/pomodoro/app/pomodoro.db
+
+    - name: Créer le service systemd pour Flask
+      copy:
+        dest: /etc/systemd/system/flask-pomodoro.service
+        content: |
+          [Unit]
+          Description=Flask Pomodoro Service
+          After=network.target
+
+          [Service]
+          User=azureuser
+          WorkingDirectory=/home/azureuser/pomodoro/app
+          Environment="FLASK_APP=app.py" "FLASK_ENV=production"
+          ExecStart=/usr/local/bin/flask run --host=0.0.0.0
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+      notify: Reload systemd
+
+    - name: Activer le service Flask au démarrage
+      systemd:
+        name: flask-pomodoro
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: Reload systemd
+      command: systemctl daemon-reload
+
+
