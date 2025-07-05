@@ -32,18 +32,38 @@
       args:
         chdir: /home/azureuser/pomodoro
 
-    - name: Créer une base SQLite vide si absente
+    - name: Installer le client sqlite3
+      apt:
+        name: sqlite3
+        state: present
+        update_cache: yes
+
+    - name: S'assurer que le dossier app existe et appartient à azureuser
+      file:
+        path: /home/azureuser/pomodoro/app
+        state: directory
+        owner: azureuser
+        group: azureuser
+        mode: '0755'
+
+    - name: Supprimer la base SQLite si elle existe (reset complet)
       file:
         path: /home/azureuser/pomodoro/app/pomodoro.db
-        state: touch
+        state: absent
+
+    - name: Initialiser la base SQLite avec la structure attendue
+      become: false
+      shell: sqlite3 /home/azureuser/pomodoro/app/pomodoro.db < /home/azureuser/pomodoro/app/init_db.sql
+      args:
+        executable: /bin/bash
+      become_user: azureuser
+
+    - name: Vérifier les droits sur la base SQLite
+      file:
+        path: /home/azureuser/pomodoro/app/pomodoro.db
         owner: azureuser
         group: azureuser
         mode: '0664'
-
-    - name: Initialiser la base SQLite avec la structure attendue
-      shell: sqlite3 /home/azureuser/pomodoro/app/pomodoro.db < /home/azureuser/pomodoro/app/init_db.sql
-      args:
-        creates: /home/azureuser/pomodoro/app/pomodoro.db
 
     - name: Créer le service systemd pour Flask
       copy:
